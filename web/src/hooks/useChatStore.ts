@@ -1,18 +1,43 @@
-import {
-    ChatBotMessages,
-    Message,
-    UserData,
-    userData,
-    Users,
-  } from "@/data/data";
+// import {
+//     ChatBotMessages,
+//     Message,
+//     UserData,
+//     userData,
+//     Users,
+//   } from "@/data/data";
   import { create } from "zustand";
   
   export interface Example {
     name: string;
     url: string;
   }
+
+  interface Message {
+    id: string;
+    roomId: string;
+    senderType: "user" | "bot";
+    userId?: number;
+    botId?: number | null;
+    message: string;
+    replyTo?: number | null;
+    status?: "sending" | "failed" | "sent";
+    sender_avatar?: string;
+    avatar: string;
+    name: string;
+    timestamp: string;
+    
+  }  
+
+  interface User {
+    id: number;
+    username: string;
+    email: string;
+    profile_picture: string; // Avatar
+    provider: string;
+  }
   
   interface State {
+    currentUser: User | null;
     selectedExample: Example;
     examples: Example[];
     input: string;
@@ -23,7 +48,7 @@ import {
   }
   
   interface Actions {
-    selectedUser: UserData;
+    setCurrentUser: (user: User) => void;
     setSelectedExample: (example: Example) => void;
     setExamples: (examples: Example[]) => void;
     setInput: (input: string) => void;
@@ -39,8 +64,10 @@ import {
   }
   
   const useChatStore = create<State & Actions>()((set) => ({
-    selectedUser: Users[4],
+    currentUser: null, // ✅ This is the actual user object (can be null initially)
   
+    setCurrentUser: (user: User) => set({ currentUser: user }), // ✅ Correct type
+    
     selectedExample: { name: "Messenger example", url: "/" },
   
     examples: [
@@ -62,17 +89,16 @@ import {
         | React.ChangeEvent<HTMLTextAreaElement>,
     ) => set({ input: e.target.value }),
   
-    chatBotMessages: ChatBotMessages,
+    chatBotMessages: [],
     setchatBotMessages: (fn) =>
       set(({ chatBotMessages }) => ({ chatBotMessages: fn(chatBotMessages) })),
   
-    messages: userData[0].messages,
+    messages:[],
     setMessages: (fn) =>
-        set(({ messages }) => {
-          const updatedMessages = fn(messages);
-          console.log("Updated messages in Zustand:", updatedMessages); 
-          return { messages: [...updatedMessages] }; //New array reference
-        }),
+      set(({ messages }) => {
+        const updatedMessages = typeof fn === "function" ? fn(messages) : fn;
+        return { messages: [...updatedMessages] };
+      }),
         
     hasInitialAIResponse: false,
     setHasInitialAIResponse: (hasInitialAIResponse) =>

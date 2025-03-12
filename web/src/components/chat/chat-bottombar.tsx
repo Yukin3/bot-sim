@@ -11,7 +11,7 @@ import {
   import { Button, buttonVariants } from "../ui/button";
   import { cn } from "@/lib/utils";
   import { AnimatePresence, motion } from "framer-motion";
-  import { Message, loggedInUserData } from "@/data/data";
+  // import { Message, loggedInUserData } from "@/data/data";
   import { EmojiPicker } from "../emoji-picker";
   import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
   import { ChatInput } from "@/components/ui/chat/chat-input";
@@ -28,14 +28,30 @@ import {
     isMobile: boolean;
     roomId: string;
   }
+
+  interface Message {
+    id: string;
+    roomId: string;
+    senderType: "user" | "bot";
+    userId?: number;
+    botId?: number | null;
+    message: string;
+    replyTo?: number | null;
+    status?: "sending" | "failed" | "sent";
+    sender_avatar?: string;
+    avatar: string;
+    name: string;
+    timestamp: string;
+}
+
   
   export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
   
   export default function ChatBottombar({ isMobile, roomId }: ChatBottombarProps) {
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState<string>("");
     const inputRef = useRef<HTMLTextAreaElement>(null);
-    const setMessages = useChatStore((state) => state.setMessages);
-    const [isLoading, setisLoading] = useState(false);
+    const setMessages = useChatStore((state) => state.setMessages );
+    const [isLoading, setIsLoading] = useState(false);
     const API_URL = "http://localhost:8080/api/conversations";
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -54,16 +70,32 @@ import {
         }
       };
   
-    const handleThumbsUp = () => {
-      const newMessage: Message = {
-        id: message.length + 1,
-        name: loggedInUserData.name,
-        avatar: loggedInUserData.avatar,
-        message: "👍",
+      const handleThumbsUp = () => {
+        const { currentUser } = useChatStore.getState(); // ✅ Get user from Zustand
+      
+        if (!currentUser) {
+          console.error("Cannot send thumbs up: No user is logged in.");
+          return;
+        }
+      
+        const newMessage: Message = {
+          id: `temp-${Date.now()}`, // ✅ Generates a unique string ID
+          roomId, // ✅ Room ID from props
+          senderType: "user",
+          userId: currentUser.id,
+          botId: null,
+          message: "👍",
+          replyTo: null,
+          status: "sent", // ✅ Can also be "sending"
+          sender_avatar: currentUser.profile_picture || "default-avatar.png",
+          avatar: currentUser.profile_picture || "default-avatar.png",
+          name: currentUser.username || "Unknown User",
+          timestamp: new Date().toISOString(),
+        };
+      
+        sendMessage(newMessage);
+        setMessage(""); // ✅ Reset input field after sending
       };
-      sendMessage(newMessage);
-      setMessage("");
-    };
   
 
     useEffect(() => {
@@ -85,10 +117,24 @@ import {
         console.error("Cannot send message: No authenticated user.");
         return;
       }
+
+      setIsLoading(true);
     
       const tempId = `temp-${Date.now()}`;
     
-      const tempMessage = {
+      // const tempMessage = {
+      //   id: tempId,
+      //   roomId,
+      //   senderType: "user",
+      //   userId: user.id,
+      //   botId: null,
+      //   message: message.trim(),
+      //   replyTo: null,
+      //   status: "sending",
+      //   sender_avatar: user.profile_picture || "default-avatar.png",
+      //   timestamp: new Date().toISOString(),
+      // };
+      const tempMessage: Message = {
         id: tempId,
         roomId,
         senderType: "user",
@@ -98,11 +144,13 @@ import {
         replyTo: null,
         status: "sending",
         sender_avatar: user.profile_picture || "default-avatar.png",
+        avatar: user.profile_picture || "default-avatar.png", // Ensure avatar is included
+        name: user.name || "Unknown User", // Ensure name is included
         timestamp: new Date().toISOString(),
-      };
+    };
     
       //TODO:FIX Optimistic UI update
-      setMessages((prevMessages) => [...prevMessages, tempMessage]);
+      setMessages((prevMessages: Message[]) => [...prevMessages, tempMessage]);
       setMessage("");
     
       try {
@@ -149,11 +197,11 @@ import {
       }));
     };
         
-    const formattedTime = new Date().toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
+    // const formattedTime = new Date().toLocaleTimeString("en-US", {
+    //   hour: "numeric",
+    //   minute: "2-digit",
+    //   hour12: true,
+    // });
 
   
     return (
@@ -276,7 +324,11 @@ import {
               variant="ghost"
               size="icon"
             >
+            {isLoading ? (
+              <div className="animate-spin h-5 w-5 border-t-2 border-white rounded-full"></div>
+            ) : (
               <SendHorizontal size={22} className="text-muted-foreground" />
+            )}     
             </Button>
           ) : (
             <Button
