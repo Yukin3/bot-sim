@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import http from "http";
+import cron from 'node-cron';
 import { Server } from "socket.io";
 import session from "express-session";
 import cookieParser from "cookie-parser";
@@ -12,7 +13,7 @@ import authRoutes from "./routes/authRotes.js";
 import userRoutes from "./routes/userRoutes.js"; 
 import conversationRoutes from "./routes/conversationRoutes.js";
 import { insertMessage } from "./models/conversationModel.js";
-import { handleBotResponse } from './services/conversationService.js';
+import { handleBotResponse, initiateBotConversations } from './services/conversationService.js';
 
 
 const app = express();
@@ -42,6 +43,9 @@ app.use(
   app.use(passport.initialize());
   app.use(passport.session());
 
+  app.set("io", io);
+
+
 
 io.on("connection", (socket) => {
     console.log(`New client connected: ${socket.id}`);
@@ -54,25 +58,20 @@ io.on("connection", (socket) => {
 
     socket.on("send_message", async (messageData) => {
         console.log("New message received:", messageData);
-    
-        // Insert user message to db
+
+        //Save message to db
         const savedMessage = await saveMessageToDatabase(messageData);
-    
+
         if (savedMessage) {
             console.log("Message saved, broadcasting to room...");
+            
+            //Emit message after save
             io.to(messageData.roomId).emit("receive_message", savedMessage);
         }
-    
-        //Trigger bot response if user message
+
+        // Trigger bot response to user
         if (messageData.senderType === "user") {
-            // const botResponse = 
-            await handleBotResponse(messageData.roomId, io);    
-            // if (botResponse) {
-            //     console.log("Bot responded:", botResponse);
-            //     io.to(messageData.roomId).emit("receive_message", botResponse);
-            // } else {
-            //     console.log("No bot response was generated.");
-            // }
+            await handleBotResponse(messageData.roomId, io);
         }
     });
     
@@ -94,6 +93,12 @@ async function saveMessageToDatabase(messageData) {
         return null;
     }
 }
+
+// Cron job for bot chime ins
+cron.schedule("0 */1,4,7,10,13,16,18,22 * * *", () => {
+    console.log("🕒Bot convo initiated on schedule...");
+    initiateBotConversations(io);
+});
 
 
 app.get("/", (req, res) => {

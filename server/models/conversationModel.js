@@ -41,19 +41,30 @@ export const getConversationsByRoomId = async (roomId) => {
 
 
 export const insertMessage = async ({ roomId, senderType, botId, userId, message, replyTo }) => {
-    if (!userId) {
-        throw new Error("User ID is required for inserting a message."); 
+    
+    if (senderType === "user" && !userId) {
+        throw new Error("User ID is required for inserting a user message.");
     }
 
-    // console.log("Inserting message for user_id:", userId); 
+    console.log("Inserting message:", { roomId, senderType, botId, userId, message, replyTo });
 
     const result = await db.query(
         `INSERT INTO conversations 
         (room_id, sender_type, bot_id, user_id, message, reply_to, timestamp) 
         VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
         RETURNING *`,
-        [roomId, senderType, botId || null, userId, message, replyTo || null]
+        [roomId, senderType, botId || null, senderType === "user" ? userId : null, message, replyTo || null]
     );
+
+    // Update bot activity
+    if (senderType === "bot" && botId) {
+        await db.query(
+            `UPDATE bot_rooms
+                SET last_updated = NOW(), status = 'active'
+                WHERE bot_id = $1 AND room_id = $2`,
+            [botId, roomId]
+        );
+    }
 
     return result.rows[0];
 };
@@ -72,6 +83,11 @@ export const getLastMessage = async (roomId) => {
         [roomId]
     );
     return result.rows[0] || null; // Null if no messages
+};
+
+export const getAllRooms = async () => {
+    const result = await db.query(`SELECT * FROM rooms`);
+    return result.rows;
 };
 
 

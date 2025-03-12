@@ -26,7 +26,7 @@ interface ChatListProps {
 }
 
 const socket = io("http://localhost:8080", {
-  transports: ["websocket"],  // Enable WebSocket mode
+  transports: ["websocket"],  // Enable websocket
 });
 
 
@@ -80,15 +80,16 @@ export function ChatList({
   
   }, [roomId, token]); // Re-run when roomId/token changes
 
-  useEffect(() => {
+useEffect(() => {
     if (!roomId) return;
 
-    console.log("🔗 Connecting to room:", roomId);
+    console.log("🔗Connecting to room:", roomId);
     socket.emit("joinRoom", roomId);
 
-    // Remove previous listeners
+    // Ensure old listeners are removed
     socket.off("receive_message");
 
+    // Append new messages
     socket.on("receive_message", async (newMessage) => {
       console.log("📩 Live message received:", newMessage);
   
@@ -96,19 +97,18 @@ export function ChatList({
           let data;
   
           if (token) {
-              console.log("🔒 Fetching protected messages after new message...");
+              // console.log("🔒 Fetching protected messages after new message...");
               data = await fetchProtectedRoomConversations(roomId, token);
           } else {
-              console.log("🔓 Fetching public messages after new message...");
+              // console.log("🔓 Fetching public messages after new message...");
               const response = await fetch(`http://localhost:8080/api/rooms/${roomId}/conversations`);
               data = await response.json();
           }
   
-          console.log("📥 Updated Messages from Fetch:", data);
+          // console.log("📥 Updated Messages from Fetch:", data);
   
-          // 🔹 Prevent UI crash if the API returns an error object
           if (!Array.isArray(data)) {
-              console.error("❌ API returned an unexpected response:", data);
+              console.error("API returned an unexpected response:", data); //Handle error object
               return;
           }
   
@@ -119,26 +119,25 @@ export function ChatList({
   });
   
 
-        // Listen for bot typing 
-        socket.on("bot_typing", (botData) => {
-          console.log("🟢Bot is typing...");
-          setIsBotTyping(true);
-          setTypingBotAvatar(botData.avatar || "https://api.dicebear.com/9.x/big-ears/svg?seed=tiff");
-      });
-  
-      socket.on("bot_stopped_typing", () => {
-          console.log("🛑Bot stopped typing.");
-          setIsBotTyping(false);
-      });
+    // Listen for typing emit
+    socket.on("bot_typing", (botData) => {
+        console.log("🟢 Bot is typing...");
+        setIsBotTyping(true);
+        setTypingBotAvatar(botData.avatar || "https://api.dicebear.com/9.x/big-ears/svg?seed=tiff");
+    });
 
-
+    socket.on("bot_stopped_typing", () => {
+        console.log("🛑 Bot stopped typing.");
+        setIsBotTyping(false);
+    });
 
     return () => {
-        socket.off("receive_message"); // Cleanup listener
+        socket.off("receive_message");
         socket.off("bot_typing");
         socket.off("bot_stopped_typing");
     };
 }, [roomId]); // Re-run when room changes
+
 
 
 
@@ -191,7 +190,7 @@ export function ChatList({
               </motion.div>
             ))}
 
-            {/* Typing Indicator*/}
+            {/* Typing indicator*/}
               {isBotTyping && (
                 <motion.div
                     key="typing-indicator"

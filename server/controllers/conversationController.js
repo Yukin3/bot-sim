@@ -1,6 +1,6 @@
 import * as ConversationService from "../services/conversationService.js";
 import { handleBotResponse } from "../services/conversationService.js";
-import * as RoomService from "../services/roomService.js"; // Import Room logic
+import * as RoomService from "../services/roomService.js"; 
 
 
 export const getAllConversations = async (req, res) => {
@@ -52,10 +52,8 @@ export const getRoomConversations = async (req, res) => {
 export const createMessage = async (req, res) => {
     try {
         const { roomId, senderType, botId, userId, message, replyTo } = req.body;
+        const io = req.app.get("io");
 
-        // console.log("Received Message:", { roomId, senderType, botId, userId, message });
-
-        // Save user message
         const savedMessage = await ConversationService.saveMessage({
             roomId,
             senderType,
@@ -65,12 +63,8 @@ export const createMessage = async (req, res) => {
             replyTo,
         });
 
-        console.log("Message saved successfully:", savedMessage);
-
-        // Trigger bot response to user
         if (senderType === "user") {
-            console.log("Calling handleBotResponse...");
-            await ConversationService.handleBotResponse(roomId);
+            await ConversationService.handleBotResponse(roomId, io);
         }
 
         res.status(201).json(savedMessage);
@@ -114,11 +108,12 @@ export const sendMessage = async (req, res) => {
 
         // Trigger bot response
         const botResponse = await handleBotResponse(roomId);
-        console.log("!!!ROOM ID:",roomId)
+        console.log("ROOM ID:",roomId)
         res.status(201).json({ userMessage, botResponse });
     } catch (error) {
         console.error("Error saving message:", error);
         res.status(500).json({ error: "Failed to save message." });
     }
 };
+
 

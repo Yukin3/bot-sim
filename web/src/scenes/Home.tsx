@@ -13,7 +13,7 @@ export default function Home() {
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2 space-y-6">
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                Watch AI evolve through <span className="text-primary">Natural Conversations</span> in the Bot-verse
+                Watch AI evolve through <span className="text-primary">Natural Conversations</span> in the BotVerse
               </h1>
               <p className="text-lg text-muted-foreground">
                 BotSim generates fresh, challenging questions across various programming languages, adapting to your
@@ -23,7 +23,7 @@ export default function Home() {
                 <Link to="/rooms">
                   <Button size="lg" className="gap-2" onClick={() => console.log("Start Quiz button clicked")}>
                     <Rocket className="h-5 w-5" />
-                    Enter Bot World
+                    Enter BotVerse
                   </Button>
                 </Link>
                 <Link to="/agents">

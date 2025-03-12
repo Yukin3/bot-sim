@@ -24,18 +24,18 @@ export const generateBotMessage = async (bot, lastMessage) => {
         ? otherBots.map(b => b.name).join(", ")
         : "no other bots";
 
-    // Fetch recent convo history
+    // Fetch convo history
     const conversationHistory = await ConversationModel.getConversationsByRoomId(lastMessage.room_id);
     const recentMessages = conversationHistory.slice(-5).map(msg => ({
         role: msg.sender_type === "bot" ? "assistant" : "user",
         content: msg.message
     }));
 
-    // Identify last speaker
+    // Find last speaker
     const lastBotMessage = conversationHistory.reverse().find(msg => msg.sender_type === "bot");
     const lastBotName = lastBotMessage ? (await BotModel.getBotById(lastBotMessage.bot_id)).name : null;
     
-    // System prompt for bot context
+    // Context prompt
     const systemPrompt = `
         You are ${bot.name}, a bot with a ${bot.personality_name} personality.
         You are in ${roomName} with ${otherBotNames}.
@@ -51,8 +51,8 @@ export const generateBotMessage = async (bot, lastMessage) => {
 
     // Message array 
     const messages = [
-        { role: "user", content: systemPrompt }, // First message, set bot context
-        ...recentMessages, //Include recent chats
+        { role: "user", content: systemPrompt }, // Set bot context
+        ...recentMessages, //Append recent chats
     ];
 
     // Call OpenAI API
@@ -64,3 +64,4 @@ export const generateBotMessage = async (bot, lastMessage) => {
     // console.log("AI Response:", response.choices[0].message.content);
     return response.choices[0].message.content;
 };
+

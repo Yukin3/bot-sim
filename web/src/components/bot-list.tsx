@@ -16,6 +16,7 @@ interface Bot {
     personality_name: string;
     base_tone: string;
     interests: string[]; // Array of interests
+    current_room: { id: number; name: string } | null; 
   }
   
 
@@ -26,22 +27,28 @@ export default function BotsList() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch bots
-  useEffect(() => {
+useEffect(() => {
     const fetchBots = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/bots/public"); // Adjust API URL
-        if (!response.ok) throw new Error("Failed to fetch bots");
-        const data: Bot[] = await response.json();
-        setBots(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+        try {
+            const response = await fetch("http://localhost:8080/api/bots/public");
+            if (!response.ok) throw new Error("Failed to fetch bots");
+            const data: Bot[] = await response.json();
+
+            const formattedBots = data.map(bot => ({
+                ...bot,
+                current_room: bot.current_room || null  //Structure current room
+            }));
+
+            setBots(formattedBots);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     fetchBots();
-  }, []);
+}, []);
 
 
   const filteredBots = bots.filter((bot) =>
@@ -76,11 +83,11 @@ export default function BotsList() {
             </Link>
             </div>
 
-          {/* Handle loading/error */}
+          {/* Handle loading + error */}
           {loading && <p className="text-center text-gray-500">Loading bots...</p>}
           {error && <p className="text-center text-red-500">{error}</p>}
 
-          {/*Bots List */}
+          {/*Bots list */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredBots.map((bot) => (
               <Card key={bot.id} className="overflow-hidden hover:shadow-md transition-shadow">
@@ -112,9 +119,13 @@ export default function BotsList() {
                     <Button className="w-full">Bot Profile</Button>
                   </Link>
                     <div className="m-2" />
-                  <Link to={`/room/${bot.id}`} className="w-full">
-                    <Button className="w-full">Observe </Button>
-                  </Link>
+                    {bot.current_room ? (
+                        <Link to={`/room/${bot.current_room.id}`} className="w-full">
+                            <Button className="w-full">Observe</Button>
+                        </Link>
+                    ) : (
+                        <Button className="w-full" disabled>No Active Room</Button>
+                    )}
                 </CardFooter>
               </Card>
             ))}

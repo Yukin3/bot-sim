@@ -74,55 +74,81 @@ import {
           // Leave room on unmount
           socket.emit("leaveRoom", roomId);
         };
-      }, [roomId]);
+    }, [roomId]);
     
-      const handleSend = async () => {
-        if (!message.trim()) return;
+    const handleSend = async () => {
+      if (!message.trim()) return;
     
-        const { user, token } = useAuthStore.getState(); // Get user from Zustand
+      const { user, token } = useAuthStore.getState();
     
-        if (!user || !token) {
-            console.error("Cannot send message: No authenticated user.");
-            console.log("Stored Token:", token);
-            console.log("Stored User:", user);
-            return;
-        }
+      if (!user || !token) {
+        console.error("Cannot send message: No authenticated user.");
+        return;
+      }
     
-        const tempId = `temp-${Date.now()}`; 
-        const newMessage = {
-            id: tempId,
+      const tempId = `temp-${Date.now()}`;
+    
+      const tempMessage = {
+        id: tempId,
+        roomId,
+        senderType: "user",
+        userId: user.id,
+        botId: null,
+        message: message.trim(),
+        replyTo: null,
+        status: "sending",
+        sender_avatar: user.profile_picture || "default-avatar.png",
+        timestamp: new Date().toISOString(),
+      };
+    
+      //TODO:FIX Optimistic UI update
+      setMessages((prevMessages) => [...prevMessages, tempMessage]);
+      setMessage("");
+    
+      try {
+        const response = await fetch(`${API_URL}/send`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
             roomId,
             senderType: "user",
-            userId: user.id,  //Correct user ID
+            userId: user.id,
             botId: null,
             message: message.trim(),
             replyTo: null,
-            status: "sending",
-        };
+          }),
+        });
     
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        if (!response.ok) throw new Error("Failed to send message.");
     
-        setMessage(""); 
+        const savedMessage = await response.json();
     
-        try {
-            await sendMessage(message.trim(), roomId);
-        } catch (error) {
-            console.error("Failed to send message:", error);
-        }
+        // Replace temp message
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) => (msg.id === tempId ? savedMessage : msg))
+        );
+      } catch (error) {
+        console.error("Failed to send message:", error);
+    
+        // Mark failed message
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === tempId ? { ...msg, status: "failed" } : msg
+          )
+        );
+      }
     };
     
-    
-    
 
-
-
-
-  const sendMessage = (newMessage: Message) => {
-    useChatStore.setState((state) => ({
-      messages: [...state.messages, newMessage],
-    }));
-  };
-      
+    const sendMessage = (newMessage: Message) => {
+      useChatStore.setState((state) => ({
+        messages: [...state.messages, newMessage],
+      }));
+    };
+        
     const formattedTime = new Date().toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",

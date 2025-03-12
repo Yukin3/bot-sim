@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LogOut, MoveUpRight, Settings, CreditCard, FileText } from "lucide-react";
+import { LogOut, MoveUpRight, Settings, CreditCard, FileText, UsersRound, MessageSquareShare, PencilRuler } from "lucide-react";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 interface MenuItem {
@@ -31,22 +31,22 @@ export default function ProfileMenu({
     icon: <Settings className="w-4 h-4" />,
     },
     {
-      label: "Appearance",
+      label: "Friends",
       value: subscription,
       href: "/subscription",
-      icon: <CreditCard className="w-4 h-4" />,
+      icon: <UsersRound className="w-4 h-4" />,
     },
     {
-        label: "Playground",
+        label: "Gearbox",
         href: "/terms",
-        icon: <FileText className="w-4 h-4" />,
-        external: true,
+        icon: <PencilRuler className="w-4 h-4" />,
     },
     {
         label: "Send Feedback",
         value: subscription,
         href: "/subscription",
-        icon: <CreditCard className="w-4 h-4" />,
+        icon: <MessageSquareShare className="w-4 h-4" />,
+        external: true,
     },
   ];
 

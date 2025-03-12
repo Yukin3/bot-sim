@@ -9,3 +9,6 @@ export const fetchUserByUsername = async (username) => {
     return await UserModel.findUserByUsername(username);
 };
 
+export const fetchUserStats = async (username) => {
+    return await UserModel.findUserStats(username);
+};
