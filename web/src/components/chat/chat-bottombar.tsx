@@ -17,8 +17,8 @@ import {
   import { ChatInput } from "@/components/ui/chat/chat-input";
   import useChatStore from "@/hooks/useChatStore";
   import { useAuthStore } from "@/hooks/useAuthStore";
-  import { sendMessage } from "@/services/chatAPI";
-  import { generateBotResponse } from "@/utils/generateBotResponse";
+  // import { sendMessage } from "@/services/chatAPI";
+  // import { generateBotResponse } from "@/utils/generateBotResponse";
   import io from "socket.io-client";
 
   const socket = io("http://localhost:8080");

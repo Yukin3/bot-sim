@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { MoreHorizontal, SquarePen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+// import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Avatar, AvatarImage } from "./ui/avatar";
 
 interface Room {
@@ -77,7 +77,7 @@ export function Sidebar({ isCollapsed, isMobile }: SidebarProps) {
             key={room.id}
             onClick={() => navigate(`/room/${room.id}`)}
             className={cn(
-              buttonVariants({ variant: "ghost", size: "xl" }),
+              buttonVariants({ variant: "ghost", size: "icon" }),
               "justify-start gap-4 w-full flex items-center p-2"
             )}
           >

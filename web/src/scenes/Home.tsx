@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button"
 import { Bot, PencilRuler, Rocket, Earth, BrainCircuit } from "lucide-react"
-import Navbar from "@/components/navbar";
 
 export default function Home() {
   return (

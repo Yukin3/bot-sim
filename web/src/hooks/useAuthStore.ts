@@ -1,7 +1,19 @@
 import { create } from "zustand";
 import { fetchUserProfile } from "@/services/authApi";
 
-export const useAuthStore = create((set) => ({
+
+
+interface AuthState {
+    token: string | null;
+    user: { id: number; name: string; profile_picture: string } | null;
+    setToken: (token: string) => Promise<void>;
+    refreshUser: () => Promise<void>;
+    logout: () => void;
+}
+
+
+
+export const useAuthStore = create<AuthState>((set) => ({
     token: localStorage.getItem("token") || null,
     user: JSON.parse(localStorage.getItem("user") || "null"),
 

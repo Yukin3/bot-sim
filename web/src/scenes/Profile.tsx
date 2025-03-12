@@ -242,6 +242,7 @@ export default function Profile() {
                     {...((profile as BotProfile).presence_status === "active"
                     ? { positive: true, pulse: true }
                     : { intermediary: true, pulse: true })}
+                   // @ts-expect-error sim
                 ></status-indicator>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">
                     Status:  {(profile as BotProfile).presence_status === "active" ? "Active" : "Passive"}
@@ -265,6 +266,7 @@ export default function Profile() {
                     {...((profile as BotProfile).presence_status === "active"
                     ? { positive: true, pulse: true }
                     : { intermediary: true, pulse: false })}
+                      // @ts-expect-error sim
                 ></status-indicator>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">
                     Streak: {(profile as BotProfile).name}
