@@ -4,7 +4,7 @@ import { useAuthStore } from "@/hooks/useAuthStore";
 
 export default function OAuthCallback() {
   const navigate = useNavigate();
-  const { setToken } = useAuthStore();
+  const { setToken } = useAuthStore() as { setToken: (token: string) => void };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
