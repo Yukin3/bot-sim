@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessagesSquare, Trophy, History, CircleUserRound, Calendar, ArrowUpRight, Lock } from "lucide-react";
+import {Trophy, History, CircleUserRound, Calendar, ArrowUpRight, Lock } from "lucide-react";
 
 interface Interest {
     interest: string;
@@ -21,6 +21,13 @@ interface Interest {
     unlocked: boolean;
     unlocked_at: string | null;
 }
+
+interface LockedAchievement {
+  id: number;
+  name: string;
+  description: string;
+}
+
   
   interface UserProfile {
     id: number;
@@ -124,13 +131,13 @@ export default function Profile() {
                       messagesSent: statsData.messages_sent || 0, 
                       totalScore: statsData.totalScore || 0, 
                       quizzesTaken: statsData.quizzesTaken || 0, 
-                      trophies: achievementsData.unlocked.map((a: any) => ({
+                      trophies: achievementsData.unlocked.map((a: Achievement) => ({
                           id: a.id,
                           name: a.name,
                           description: a.description,
                           unlocked_at: a.unlocked_at,
                       })), 
-                      lockedTrophies: achievementsData.locked.map((a: any) => ({
+                      lockedTrophies: achievementsData.locked.map((a: LockedAchievement) => ({
                           id: a.id,
                           name: a.name,
                           description: a.description,
@@ -155,7 +162,7 @@ export default function Profile() {
                       personality_name: data.personality_name,
                       base_tone: data.base_tone,
                       presence_status: data.presence_status || "Inactive",
-                      interests: data.interests.map((i: any) => ({
+                      interests: data.interests.map((i: Interest) => ({
                           interest: i.interest,
                           affinity: i.affinity,
                       })),
@@ -163,13 +170,13 @@ export default function Profile() {
                       total_messages: data.total_messages || 0,
                       energy_level: data.energy_level || 100,
                       rank: data.rank || "Unranked",
-                      milestones: achievementsData.unlocked.map((a: any) => ({
+                      milestones: achievementsData.unlocked.map((a: Achievement) => ({
                           id: a.id,
                           name: a.name,
                           description: a.description,
                           unlocked_at: a.unlocked_at,
                       })), 
-                      lockedAchievements: achievementsData.locked.map((a: any) => ({
+                      lockedAchievements: achievementsData.locked.map((a: LockedAchievement) => ({
                           id: a.id,
                           name: a.name,
                           description: a.description,
@@ -205,15 +212,20 @@ export default function Profile() {
             {/* Profile header */}
             <div className="bg-card rounded-xl p-6 shadow-sm mb-8 flex flex-col md:flex-row gap-6 items-center md:items-start">
               <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-              <img src={isUserProfile ? (profile as UserProfile).profile_picture : (profile as BotProfile).profile_picture} alt={(profile as BotProfile).name} className="h-16 w-16 rounded-full object-cover" />
-              </div>
+              <img 
+                src={isUserProfile 
+                  ? (profile as UserProfile).profile_picture ?? "/default-user.png" 
+                  : (profile as BotProfile).profile_picture ?? "/default-bot.png"}
+                alt={(profile as BotProfile).name} 
+                className="h-16 w-16 rounded-full object-cover" 
+              />              </div>
               <div className="flex-1 text-center md:text-left">
                 <h1 className="text-3xl font-bold">
                 {isUserProfile ? (profile as UserProfile).username : (profile as BotProfile).name}
                 </h1>
                 {isUserProfile && (
                   <p className="text-muted-foreground">
-                    Joined {(profile as UserProfile).joinDate}
+                    Joined {(profile as UserProfile).accountCreated}
                   </p>
                 )}
                 {!isUserProfile && (
@@ -436,7 +448,7 @@ export default function Profile() {
                     </CardHeader>
                     <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                    {profile?.trophies?.slice(0, 6).map((trophy) => (
+                    {(profile as UserProfile)?.trophies?.slice(0, 6).map((trophy) => (
                         <div key={trophy.id} className="bg-muted/50 rounded-lg p-4 text-center">
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
                                 <Trophy className="h-6 w-6 text-primary" />
@@ -463,7 +475,7 @@ export default function Profile() {
                     </CardHeader>
                     <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                        {profile?.lockedTrophies?.slice(0, 6).map((trophy) => (
+                    {(profile as UserProfile)?.lockedTrophies?.slice(0, 6).map((trophy) => (
                         <div key={trophy.id} className="bg-muted/50 rounded-lg p-4 text-center opacity-60">
                             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
                             <Lock className="h-6 w-6 text-muted-foreground" />
@@ -509,7 +521,7 @@ export default function Profile() {
                         <CardTitle className="text-sm font-medium text-muted-foreground">Energy Level</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">{97-(profile as UserProfile).id?.toLocaleString()}%</div>
+                        <div className="text-3xl font-bold">97%</div>
                     </CardContent>
                     </Card>
                     <Card>
@@ -592,7 +604,7 @@ export default function Profile() {
                     </CardHeader>
                     <CardContent>
                     <div className="flex flex-wrap gap-2">
-                    {profile?.milestones?.map((milestone) => (
+                    {(profile as BotProfile)?.milestones?.map((milestone) => (
                       <Badge key={milestone.id} variant="secondary" className="px-3 py-1">
                           <div className="bg-muted/50 rounded-lg p-4 text-center">
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
