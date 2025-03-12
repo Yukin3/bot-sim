@@ -1,12 +1,12 @@
 
-import { config } from "dotenv";
-import OpenAI from "openai";
+import dotenv from 'dotenv';
+dotenv.config();import OpenAI from "openai";
 import * as ConversationModel from "../models/conversationModel.js";
 import * as RoomModel from "../models/roomModel.js";
 import * as BotModel from "../models/botModel.js";
-config();
+
 const openai = new OpenAI({
-    apiKey: "",
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 export const generateBotMessage = async (bot, lastMessage) => {
