@@ -20,14 +20,23 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173", // Allow frontend connection
+        origin: [ // Allow frontend connection
+            "http://localhost:5173", 
+            "https://bot-sim.vercel.app"
+        ],
         methods: ["GET", "POST"]
     }
 });
 
 
 //middleware
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(cors({
+    origin: [
+         process.env.FRONTEND_URL,
+        "http://localhost:5173",    // Local dev
+        "https://bot-sim.vercel.app" //Prod url
+    ],
+    credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
