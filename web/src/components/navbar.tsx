@@ -43,13 +43,13 @@ export default function Navbar() {
             <Popover>
                 <PopoverTrigger asChild>
                 <Avatar className="h-10 w-10 cursor-pointer hover:scale-105 transition-transform duration-150">
-                    <AvatarImage src={user.profile_picture || "/default-avatar.png"} alt={user.username} />
-                    <AvatarFallback>{user.username?.charAt(0) || "U"}</AvatarFallback>
+                    <AvatarImage src={user.profile_picture || "/default-avatar.png"} alt={user.name} />
+                    <AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
                 </PopoverTrigger>
                 <PopoverContent className="w-64 mt-2 shadow-lg">
                 <ProfileMenu
-                    name={user.username}
+                    name={user.name}
                     role="Bot Enthusiast" // Adjust role dynamically later
                     avatar={user.profile_picture || "/default-avatar.png"}
                 />

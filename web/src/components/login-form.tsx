@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,9 +23,9 @@ export function LoginForm({ isSignUp, setIsSignUp, className, ...props }: LoginF
   const [username, setUsername] = useState(""); 
   const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState(""); 
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState<string | null>(null);
   const { setToken } = useAuthStore(); 
-  const navigate = useNavigate(); 
+  // const navigate = useNavigate(); 
 
 
 
@@ -64,9 +64,14 @@ export function LoginForm({ isSignUp, setIsSignUp, className, ...props }: LoginF
     console.log("🔑 Token Stored:", localStorage.getItem("token")); 
 
         window.location.href = "/"; // Redirect to home
-      } catch (err: any) {
-        console.error("Auth Error:", err);
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Auth Error:", err);
+          setError(err.message);
+        } else {
+          console.error("Unknown error:", err);
+          setError("An unexpected error occurred.");
+        }
       }
     };
     

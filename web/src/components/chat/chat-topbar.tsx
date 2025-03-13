@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
-import { UserData } from "@/data/data";
-import { Info, Video, Grip } from "lucide-react"; 
+import { Info, Grip } from "lucide-react"; 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,7 +27,8 @@ export const TopbarIcons = [
 
 export default function ChatTopbar() {
   const navigate = useNavigate();
-  const { id: roomId } = useParams(); 
+  const { id } = useParams();
+  const roomId = id ?? ""; // ✅ Ensures `roomId` is always a string
   const [room, setRoom] = useState<Room | null>(null);
 
 const API_URL = "http://localhost:8080/api"
@@ -82,7 +82,7 @@ const API_URL = "http://localhost:8080/api"
             className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "h-9 w-9")}
             onClick={() => {
               if (typeof item.route === "function") {
-                navigate(item.route(roomId)); 
+                navigate(item.route(roomId ?? "" )); 
               } else if (item.route !== "#") {
                 navigate(item.route); 
               }
