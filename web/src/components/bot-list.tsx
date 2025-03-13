@@ -25,12 +25,14 @@ export default function BotsList() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+
 
   // Fetch bots
 useEffect(() => {
     const fetchBots = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/bots/public");
+            const response = await fetch(`${API_URL}/bots/public`);
             if (!response.ok) throw new Error("Failed to fetch bots");
             const data: Bot[] = await response.json();
 

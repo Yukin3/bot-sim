@@ -31,7 +31,7 @@ export default function ChatTopbar() {
   const roomId = id ?? ""; // ✅ Ensures `roomId` is always a string
   const [room, setRoom] = useState<Room | null>(null);
 
-const API_URL = "http://localhost:8080/api"
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchRoomInfo = async () => {

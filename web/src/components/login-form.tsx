@@ -26,6 +26,7 @@ export function LoginForm({ isSignUp, setIsSignUp, className, ...props }: LoginF
   const [error, setError] = useState<string | null>(null);
   const { setToken } = useAuthStore(); 
   // const navigate = useNavigate(); 
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 
 
@@ -37,7 +38,7 @@ export function LoginForm({ isSignUp, setIsSignUp, className, ...props }: LoginF
       const endpoint = isSignUp ? "register" : "login"; // Switch endpoints
     
       try {
-        const res = await fetch(`http://localhost:8080/api/auth/${endpoint}`, {
+        const res = await fetch(`${API_URL}/auth/${endpoint}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(
@@ -93,7 +94,7 @@ export function LoginForm({ isSignUp, setIsSignUp, className, ...props }: LoginF
 
               {/* Oauths */}
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full" onClick={() => window.location.href = "http://localhost:8080/api/auth/github"}>
+                <Button variant="outline" className="w-full" onClick={() => window.location.href =`${API_URL}/auth/github`}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 438.549 438.549">
                     <path
                       fill="currentColor"
@@ -102,7 +103,7 @@ export function LoginForm({ isSignUp, setIsSignUp, className, ...props }: LoginF
                   </svg>
                   Login with GitHub
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => window.location.href = "http://localhost:8080/api/auth/google"}>
+                <Button variant="outline" className="w-full" onClick={() => window.location.href = `${API_URL}/auth/google`}>
                 <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" >
                 <path
                   fill="currentColor"

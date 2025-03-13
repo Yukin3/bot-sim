@@ -24,8 +24,8 @@ export function ChatLayout({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState([]);
-  const API_URL = "http://localhost:8080/api"
-//   console.log("Chat ID from URL:", id); 
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  //   console.log("Chat ID from URL:", id); 
 
   // const chatId = Number(id);
   // const selectedUser = userData.find((user) => user.id === chatId);

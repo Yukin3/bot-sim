@@ -1,10 +1,12 @@
 import { useAuthStore } from "@/hooks/useAuthStore";
 import useChatStore from "@/hooks/useChatStore";import io from "socket.io-client";
 
-const socket = io("http://localhost:8080"); // Socket connection
+const socket = io("http://3.92.185.156/:8080"); // Socket connection
 
 export const sendMessage = async (messageText: string, roomId: number) => {
     const { user, token } = useAuthStore.getState(); // Get logged-in user + token
+    const API_URL = import.meta.env.VITE_BACKEND_URL;
+
 
     if (!user || !token) {
         console.error("Cannot send message: No authenticated user.");
@@ -13,7 +15,7 @@ export const sendMessage = async (messageText: string, roomId: number) => {
 
     try {
         //Send message to server
-        const response = await fetch("http://localhost:8080/api/rooms/send-message", {
+        const response = await fetch(`${API_URL}/rooms/send-message`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

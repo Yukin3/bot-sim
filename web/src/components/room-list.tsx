@@ -25,13 +25,14 @@ export default function RoomsList() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 
   // Fetch rooms
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/rooms");
+        const response = await fetch(`${API_URL}/rooms`);
         if (!response.ok) throw new Error("Failed to fetch rooms");
         const data: Room[] = await response.json();
 

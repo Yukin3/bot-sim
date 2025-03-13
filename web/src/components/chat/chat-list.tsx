@@ -21,7 +21,7 @@ interface ChatListProps {
   // isMobile: boolean; //TODO: handle mobile support
 }
 
-const socket = io("http://localhost:8080", {
+const socket = io("http://3.92.185.156/:8080", {
   transports: ["websocket"],  // Enable websocket
 });
 
@@ -40,6 +40,8 @@ export function ChatList({
     { icon: Forward, type: "Like" },
     { icon: Heart, type: "Share" },
   ];
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+
 
   
   useEffect(() => {
@@ -60,7 +62,7 @@ export function ChatList({
           data = await fetchProtectedRoomConversations(Number(roomId), token); // Fetch protected messages if logged in
         } else {
           console.log("Fetching public messages...");
-          const response = await fetch(`http://localhost:8080/api/rooms/${roomId}/conversations`);
+          const response = await fetch(`${API_URL}/rooms/${roomId}/conversations`);
           data = await response.json(); // Fetch public messages if not logged in
         }
   
@@ -97,7 +99,7 @@ useEffect(() => {
               data = await fetchProtectedRoomConversations(Number(roomId), token);
           } else {
               // console.log("🔓 Fetching public messages after new message...");
-              const response = await fetch(`http://localhost:8080/api/rooms/${roomId}/conversations`);
+              const response = await fetch(`${API_URL}/rooms/${roomId}/conversations`);
               data = await response.json();
           }
   

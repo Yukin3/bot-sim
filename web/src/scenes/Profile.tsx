@@ -96,6 +96,8 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | BotProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>("overview");
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+
 
   const isUserProfile = !id; //No ID if user
   const username = isUserProfile ? location.pathname.split("/")[1] : null; // Extract username from URL
@@ -105,8 +107,8 @@ export default function Profile() {
       const fetchProfile = async () => {
           try {
               const apiUrl = isUserProfile
-                  ? `http://localhost:8080/api/user/${username}`
-                  : `http://localhost:8080/api/bots/${id}`;
+                  ? `${API_URL}/user/${username}`
+                  : `${API_URL}/bots/${id}`;
   
               const response = await fetch(apiUrl);
               if (!response.ok) throw new Error("Profile not found");
@@ -115,11 +117,11 @@ export default function Profile() {
   
               if (isUserProfile) {
                   //Fetch user stats
-                  const statsResponse = await fetch(`http://localhost:8080/api/user/${username}/stats`);
+                  const statsResponse = await fetch(`${API_URL}/user/${username}/stats`);
                   const statsData = await statsResponse.json();
   
                   //Fetch user achievements
-                  const achievementsResponse = await fetch(`http://localhost:8080/api/user/${data.id}/achievements`);
+                  const achievementsResponse = await fetch(`${API_URL}/user/${data.id}/achievements`);
                   const achievementsData = await achievementsResponse.json();
   
                   const formattedUser: UserProfile = {
@@ -149,7 +151,7 @@ export default function Profile() {
                   setProfile(formattedUser);
               } else {
                   //Fetch bot achievements
-                  const achievementsResponse = await fetch(`http://localhost:8080/api/bots/${id}/achievements`);
+                  const achievementsResponse = await fetch(`${API_URL}/bots/${id}/achievements`);
                   const achievementsData = await achievementsResponse.json();
   
                   const formattedBot: BotProfile = {

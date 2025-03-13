@@ -21,7 +21,7 @@ import {
   // import { generateBotResponse } from "@/utils/generateBotResponse";
   import io from "socket.io-client";
 
-  const socket = io("http://localhost:8080");
+  const socket = io("http://3.92.185.156/:8080");
 
 
   interface ChatBottombarProps {
@@ -52,7 +52,7 @@ import {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const setMessages = useChatStore((state) => state.setMessages );
     const [isLoading, setIsLoading] = useState(false);
-    const API_URL = "http://localhost:8080/api/conversations";
+    const API_URL = import.meta.env.VITE_BACKEND_URL;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       setMessage(event.target.value);
@@ -154,7 +154,7 @@ import {
       setMessage("");
     
       try {
-        const response = await fetch(`${API_URL}/send`, {
+        const response = await fetch(`${API_URL}/conversations/send`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

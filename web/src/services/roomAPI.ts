@@ -1,8 +1,9 @@
 export const fetchProtectedRoomConversations = async (roomId: number, token: string) => {
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
     try {
       console.log("🪙Sending Token in Request:", token); 
 
-      const response = await fetch(`http://localhost:8080/api/rooms/${roomId}/protected-conversations`, {
+      const response = await fetch(`${API_URL}/rooms/${roomId}/protected-conversations`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
