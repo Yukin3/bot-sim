@@ -1,28 +1,24 @@
-import { Message, UserData } from "@/app/data";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { cn } from "@/lib/utils";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
-import ChatBottombar from "./chat-bottombar";
+// import ChatBottombar from "./chat-bottombar";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChatBubbleAvatar } from "@/components/ui/chat/chat-bubble";
-import { ChatBubbleMessage } from "@/components/ui/chat/chat-bubble";
-import { ChatBubbleTimestamp } from "@/components/ui/chat/chat-bubble";
-import { ChatBubble } from "@/components/ui/chat/chat-bubble";
-import { ChatBubbleAction } from "@/components/ui/chat/chat-bubble";
-import { ChatBubbleActionWrapper } from "@/components/ui/chat/chat-bubble";
+// import { ChatBubbleAction } from "@/components/ui/chat/chat-bubble";
+import { ChatBubbleActionWrapper, ChatBubble, ChatBubbleTimestamp, ChatBubbleMessage, ChatBubbleAvatar } from "@/components/ui/chat/chat-bubble";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list"; 
 import TypingIndicator from "@/components/ui/chat/typing-indicator";
-import { useAutoScroll } from "@/components/ui/chat/useAutoScroll";
+// import { useAutoScroll } from "@/components/ui/chat/useAutoScroll"; //TODO: Implement auto scroll
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { Message } from "@/hooks/useChatStore"; 
 import { fetchProtectedRoomConversations } from "@/services/roomAPI";
-import { DotsVerticalIcon, HeartIcon, Share1Icon } from "@radix-ui/react-icons";
-import { Forward, Heart } from "lucide-react";
+import { EllipsisVertical, Forward, Heart } from "lucide-react";
 
 
 interface ChatListProps {
-  messages: any[];
+  messages: Message[];
   roomId: string;
-  isMobile: boolean;
+  // isMobile: boolean; //TODO: handle mobile support
 }
 
 const socket = io("http://localhost:8080", {
@@ -32,15 +28,15 @@ const socket = io("http://localhost:8080", {
 
 export function ChatList({
   roomId,
-  isMobile,
+  // isMobile, //TODO: handle mobile support
 }: ChatListProps) {
   const { token } = useAuthStore(); 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [typingBotAvatar, setTypingBotAvatar] = useState("https://api.dicebear.com/9.x/big-ears/svg?seed=tiff");
   const [isBotTyping, setIsBotTyping] = useState(false);
   console.log("Rendering messages:", messages);
   const actionIcons = [
-    { icon: DotsVerticalIcon, type: "More" },
+    { icon: EllipsisVertical, type: "More" },
     { icon: Forward, type: "Like" },
     { icon: Heart, type: "Share" },
   ];
@@ -57,11 +53,11 @@ export function ChatList({
   
     const fetchMessages = async () => {
       try {
-        let data;
+        let data: Message[] = [];
         
         if (token) { 
           console.log("Fetching protected messages...");
-          data = await fetchProtectedRoomConversations(roomId, token); // Fetch protected messages if logged in
+          data = await fetchProtectedRoomConversations(Number(roomId), token); // Fetch protected messages if logged in
         } else {
           console.log("Fetching public messages...");
           const response = await fetch(`http://localhost:8080/api/rooms/${roomId}/conversations`);
@@ -98,7 +94,7 @@ useEffect(() => {
   
           if (token) {
               // console.log("🔒 Fetching protected messages after new message...");
-              data = await fetchProtectedRoomConversations(roomId, token);
+              data = await fetchProtectedRoomConversations(Number(roomId), token);
           } else {
               // console.log("🔓 Fetching public messages after new message...");
               const response = await fetch(`http://localhost:8080/api/rooms/${roomId}/conversations`);
@@ -160,21 +156,21 @@ useEffect(() => {
                 transition={{ duration: 0.2 }}
                 className="flex flex-col gap-2 p-4"
               >
-                <ChatBubble variant={message.sender_type === "bot" ? "received" : "sent"}>
+                <ChatBubble variant={message.senderType === "bot" ? "received" : "sent"}>
                   <ChatBubbleAvatar src={message.sender_avatar || "default-avatar.png"}/>
                   <ChatBubbleMessage>
                     {message.message}
                     <ChatBubbleTimestamp timestamp={message.timestamp} />
 
                     {/* Handle failed messages */}
-                    {message.status === "failed" && (
+                    {/* {message.status === "failed" && (
                         <button 
                             className="text-red-500 ml-2 text-xs"
                             onClick={() => handleSend(message)}
                         >
                             Retry 🔄
                         </button>
-                    )}
+                    )} */}
 
                     {/* Pending indicator */}
                     {message.status === "sending" && (
@@ -182,9 +178,11 @@ useEffect(() => {
                     )}
                   </ChatBubbleMessage>
                   <ChatBubbleActionWrapper>
-                    <ChatBubbleAction className="size-7" icon={<DotsVerticalIcon className="size-4" />} />
-                    <ChatBubbleAction className="size-7" icon={<Forward className="size-4" />} />
-                    <ChatBubbleAction className="size-7" icon={<Heart className="size-4" />} />
+                  {actionIcons.map((action, index) => (
+                  <button key={index} className="p-2">
+                    <action.icon className="h-5 w-5" />
+                  </button>
+                ))}
                   </ChatBubbleActionWrapper>
                 </ChatBubble>
               </motion.div>
@@ -204,11 +202,14 @@ useEffect(() => {
                     <ChatBubble variant="received">
                         <ChatBubbleAvatar src={typingBotAvatar}/>
                         <ChatBubbleMessage>
-                            {true ? (  //TODO: set false for text indicator | make dynamic w settings
+                            {/* {isBotTyping ? (  //TODO: set false for text indicator | make dynamic w settings
                                 <TypingIndicator />
                             ) : (
                                 <span className="text-gray-500 italic">Typing...</span>
-                            )}
+                            )} */}
+                            {isBotTyping && (
+                                <TypingIndicator />
+                              )}
                         </ChatBubbleMessage>
                     </ChatBubble>
                 </motion.div>

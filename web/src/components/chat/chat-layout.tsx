@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, } from "react-router-dom";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "../sidebar";
 import { Chat } from "@/components/chat/chat";
-import { userData, UserData } from "@/data/data";
+// import { userData } from "@/data/data";
 
 interface ChatLayoutProps {
   defaultLayout?: number[];
@@ -20,15 +20,15 @@ export function ChatLayout({
   navCollapsedSize,
 }: ChatLayoutProps) {
   const { id } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState([]);
   const API_URL = "http://localhost:8080/api"
 //   console.log("Chat ID from URL:", id); 
 
-  const chatId = Number(id);
-  const selectedUser = userData.find((user) => user.id === chatId);
+  // const chatId = Number(id);
+  // const selectedUser = userData.find((user) => user.id === chatId);
 
   useEffect(() => {
     const checkScreenWidth = () => {
@@ -83,7 +83,7 @@ export function ChatLayout({
       <ResizableHandle withHandle />
 
       <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-          <Chat messages={messages} roomId={id}  isMobile={isMobile} />
+          <Chat messages={messages} roomId={id ?? ""}  isMobile={isMobile} />
       </ResizablePanel>
     </ResizablePanelGroup>
   );

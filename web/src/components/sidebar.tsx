@@ -23,7 +23,7 @@ interface SidebarProps {
 const API_URL = "http://localhost:8080/api"
 
 
-export function Sidebar({ isCollapsed, isMobile }: SidebarProps) {
+export function Sidebar({ isCollapsed }: SidebarProps) {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
 

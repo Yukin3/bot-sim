@@ -12,7 +12,7 @@
     url: string;
   }
 
-  interface Message {
+  export interface Message {
     id: string;
     roomId: string;
     senderType: "user" | "bot";
