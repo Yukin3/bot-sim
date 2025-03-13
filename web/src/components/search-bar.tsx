@@ -7,6 +7,7 @@ import useDebounce from "@/hooks/use-debounce";
 interface SearchItem {
   id: string | number;
   label: string;
+  avatar?: string;
   description?: string;
 }
 

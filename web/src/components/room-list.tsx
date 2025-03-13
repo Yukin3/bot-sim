@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessagesSquare, MessageSquareLock, MapPlus, Users } from "lucide-react"; 
+import { MessagesSquare, MessageSquareLock, MapPlus } from "lucide-react"; 
 import { SearchBar } from "./search-bar";
+import StatusIndicator from "./status-indicator";
+
 
 interface Room {
     id: number;
@@ -31,18 +33,22 @@ export default function RoomsList() {
       try {
         const response = await fetch("http://localhost:8080/api/rooms");
         if (!response.ok) throw new Error("Failed to fetch rooms");
-        const data = await response.json();
+        const data: Room[] = await response.json();
 
         //Match response to interface
-        const formattedRooms: Room[] = data.map((room: any) => ({
+        const formattedRooms: Room[] = data.map((room) => ({
           ...room,
           bot_count: Number(room.bot_count), // Convert string to number
         }));
     
         setRooms(formattedRooms); //Store transformed data
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+      } else {
+          setError("An unknown error occurred"); //Handle unexpected error
+      }
+        } finally {
         setLoading(false);
       }
     };
@@ -67,7 +73,11 @@ export default function RoomsList() {
                 <div className="w-1/2 max-w-2xl mr-[300px] mt-2 mb-8 mx-auto" >
                     <SearchBar
                     placeholder="Search bots..."
-                    data={rooms}
+                    data={rooms.map((room) => ({
+                      id: room.id,
+                      label: room.name,
+                      description: room.description,
+                    }))}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onSelect={(room) => console.log("Selected Room:", room)}
@@ -110,12 +120,19 @@ export default function RoomsList() {
                 <CardContent className="pt-0.5">
                     {/* Status indicator */}
                     <div className="flex items-center gap-2 pb-5">
-                        <status-indicator
+                      {/* //TODO: FIX status indicator */}
+                        {/* <status-indicator
                         className="scale-125" // Scale up size
                         {...(room.status === "active"
+                        ? { positive: true, pulse: true }
+                        : { intermediary: true })}
+                        ></status-indicator> */}
+                        <StatusIndicator
+                          className="scale-125" // Scale up size
+                          {...(room.status === "active"
                             ? { positive: true, pulse: true }
                             : { intermediary: true })}
-                        ></status-indicator>
+                        />
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {room.status === "active" ? "Active" : "Passive"}
                         </span>

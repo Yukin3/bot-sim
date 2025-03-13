@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bot, PencilRuler, Users } from "lucide-react"; 
+import { Bot, PencilRuler } from "lucide-react"; 
 import { SearchBar } from "@/components/search-bar";
 
 
@@ -40,8 +40,12 @@ useEffect(() => {
             }));
 
             setBots(formattedBots);
-        } catch (err: any) {
+        } catch (err: unknown) {
+          if (err instanceof Error) {
             setError(err.message);
+        } else {
+            setError("An unknown error occurred"); //Handle unexpected error
+        }
         } finally {
             setLoading(false);
         }
@@ -67,7 +71,11 @@ useEffect(() => {
             <div className="w-1/2 max-w-2xl mr-[300px] mt-2 mb-8 mx-auto" >
               <SearchBar
                 placeholder="Search bots..."
-                data={bots}
+                data={bots.map((bot) => ({
+                  id: bot.id,
+                  label: bot.name,
+                  avatar: bot.profile_picture,
+                }))}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onSelect={(bot) => console.log("Selected Bot:", bot)}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import 'status-indicator';
 @import 'status-indicator/styles.css';
 
 @plugin "tailwindcss-animate";

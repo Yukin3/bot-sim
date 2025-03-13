@@ -1,6 +1,5 @@
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useChatStore } from "@/hooks/useChatStore";
-import io from "socket.io-client";
+import useChatStore from "@/hooks/useChatStore";import io from "socket.io-client";
 
 const socket = io("http://localhost:8080"); // Socket connection
 

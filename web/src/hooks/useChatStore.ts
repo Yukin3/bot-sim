@@ -91,11 +91,13 @@
   
     chatBotMessages: [],
     setchatBotMessages: (fn) =>
-      set(({ chatBotMessages }) => ({ chatBotMessages: fn(chatBotMessages) })),
+      set(({ chatBotMessages }: State) => ({ chatBotMessages: fn(chatBotMessages) })),
+      // set(({ chatBotMessages }) => ({ chatBotMessages: fn(chatBotMessages) })),
   
     messages:[],
     setMessages: (fn) =>
-      set(({ messages }) => {
+      // set(({ messages }) => {
+      set(({ messages }: State) => {
         const updatedMessages = typeof fn === "function" ? fn(messages) : fn;
         return { messages: [...updatedMessages] };
       }),

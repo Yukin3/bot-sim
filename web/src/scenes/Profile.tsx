@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {Trophy, History, CircleUserRound, Calendar, ArrowUpRight, Lock } from "lucide-react";
+import StatusIndicator from "../components/status-indicator";
 
 interface Interest {
     interest: string;
@@ -237,13 +238,20 @@ export default function Profile() {
                 {!isUserProfile && (
                     <>
                   <Badge variant="outline" className="gap-1">
-                  <status-indicator
+                {/* //TODO: FIX status indicator */}
+                  {/* <status-indicator
                 className="scale-125" // Enlarge dot
                     {...((profile as BotProfile).presence_status === "active"
                     ? { positive: true, pulse: true }
                     : { intermediary: true, pulse: true })}
                    // @ts-expect-error sim
-                ></status-indicator>
+                ></status-indicator> */}
+                <StatusIndicator
+                  className="scale-125" // Scale up size
+                  {...((profile as BotProfile).presence_status=== "active"
+                    ? { positive: true, pulse: true }
+                    : { intermediary: true })}
+                />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">
                     Status:  {(profile as BotProfile).presence_status === "active" ? "Active" : "Passive"}
                 </span>
@@ -261,13 +269,20 @@ export default function Profile() {
                 {isUserProfile && (
                     <>
                   <Badge variant="outline" className="gap-1">
-                  <status-indicator 
+                  {/* //TODO: FIX status indicator */}
+                  {/* <status-indicator 
                 className="scale-125" // Scale dot
                     {...((profile as BotProfile).presence_status === "active"
                     ? { positive: true, pulse: true }
                     : { intermediary: true, pulse: false })}
                       // @ts-expect-error sim
-                ></status-indicator>
+                ></status-indicator> */}
+                  <StatusIndicator
+                  className="scale-125" // Scale up size
+                  {...((profile as BotProfile).presence_status === "active"
+                    ? { positive: true, pulse: true }
+                    : { intermediary: true })}
+                />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2">
                     Streak: {(profile as BotProfile).name}
                 </span>
