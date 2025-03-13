@@ -17,6 +17,14 @@ export default defineConfig({
     },
   },
   server: {
-    historyApiFallback: true,
-  }
+    fs: {
+      strict: false
+    },
+    watch: {
+      usePolling: true
+    },
+  },
+  build: {
+    outDir: "dist",
+  },
 });
